@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroSim Checklists - Gestionnaire de Checklists Flight Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>✈️ AeroSim Checklists</h1>
+            <p class="subtitle">Gestionnaire de checklists pour Flight Simulator</p>
+            <button id="darkModeToggle" class="btn-icon" title="Basculer le mode sombre">
+                🌙
+            </button>
+        </header>
+
+        <!-- Main Controls -->
+        <div class="main-controls">
+            <button id="newChecklistBtn" class="btn btn-primary">
+                ➕ Nouvelle Checklist
+            </button>
+            <div class="import-export">
+                <button id="exportBtn" class="btn btn-secondary">
+                    📤 Exporter
+                </button>
+                <label for="importFile" class="btn btn-secondary">
+                    📥 Importer
+                </label>
+                <input type="file" id="importFile" accept=".json" hidden>
+            </div>
+        </div>
+
+        <!-- Filter by Aircraft -->
+        <div class="filter-section">
+            <label for="aircraftFilter">Filtrer par avion:</label>
+            <select id="aircraftFilter" class="select-input">
+                <option value="">Tous les avions</option>
+            </select>
+        </div>
+
+        <!-- Checklists List -->
+        <div class="checklists-container">
+            <div id="checklistsList" class="checklists-list">
+                <!-- Checklists will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Modal for Creating/Editing Checklist -->
+        <div id="checklistModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Nouvelle Checklist</h2>
+                    <button class="close-btn" id="closeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="checklistForm">
+                        <div class="form-group">
+                            <label for="checklistName">Nom de la checklist *</label>
+                            <input type="text" id="checklistName" class="input-field" required placeholder="Ex: Démarrage Cessna 172">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="aircraftType">Type d'avion</label>
+                            <input type="text" id="aircraftType" class="input-field" placeholder="Ex: Cessna 172">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Étapes de la checklist</label>
+                            <div id="stepsList" class="steps-list">
+                                <!-- Steps will be added here -->
+                            </div>
+                            <button type="button" id="addStepBtn" class="btn btn-secondary btn-small">
+                                ➕ Ajouter une étape
+                            </button>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" id="cancelBtn" class="btn btn-secondary">
+                                Annuler
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                💾 Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+            <div class="empty-icon">✈️</div>
+            <h3>Aucune checklist</h3>
+            <p>Créez votre première checklist pour commencer</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
