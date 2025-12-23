@@ -89,6 +89,34 @@ class ChecklistManager {
         if (stored) {
             try {
                 this.checklists = JSON.parse(stored);
+                
+                // Migrate old format to new format
+                this.checklists = this.checklists.map(checklist => {
+                    // Check if this is old format (has 'steps' instead of 'checklists')
+                    if (checklist.steps && !checklist.checklists) {
+                        return {
+                            id: checklist.id,
+                            title: checklist.name || 'Imported Checklist',
+                            aircraft: checklist.aircraft || '',
+                            checklists: [{
+                                id: Date.now() + Math.random(),
+                                name: 'Main Checklist',
+                                items: checklist.steps.map(step => ({
+                                    id: step.id,
+                                    name: step.text || '',
+                                    action: '',
+                                    comment: '',
+                                    completed: step.completed || false
+                                }))
+                            }],
+                            createdAt: checklist.createdAt || new Date().toISOString()
+                        };
+                    }
+                    return checklist;
+                });
+                
+                // Save the migrated data
+                this.saveToStorage();
             } catch (e) {
                 console.error('Erreur lors du chargement des données:', e);
                 this.checklists = [];
@@ -402,9 +430,34 @@ class ChecklistManager {
                     let baseTime = Date.now();
                     imported.forEach((checklist, checklistIndex) => {
                         checklist.id = baseTime + checklistIndex * 10000 + Math.floor(Math.random() * 1000);
-                        checklist.steps.forEach((step, stepIndex) => {
-                            step.id = baseTime + checklistIndex * 10000 + stepIndex * 100 + Math.floor(Math.random() * 100);
-                        });
+                        
+                        // Handle new format (with checklists)
+                        if (checklist.checklists && Array.isArray(checklist.checklists)) {
+                            checklist.checklists.forEach((subChecklist, subChecklistIndex) => {
+                                subChecklist.id = baseTime + checklistIndex * 10000 + subChecklistIndex * 1000 + Math.floor(Math.random() * 1000);
+                                subChecklist.items.forEach((item, itemIndex) => {
+                                    item.id = baseTime + checklistIndex * 10000 + subChecklistIndex * 1000 + itemIndex * 10 + Math.floor(Math.random() * 10);
+                                });
+                            });
+                        } 
+                        // Handle old format (with steps) - convert to new format
+                        else if (checklist.steps && Array.isArray(checklist.steps)) {
+                            const convertedChecklist = {
+                                id: checklist.id,
+                                name: 'Main Checklist',
+                                items: checklist.steps.map((step, stepIndex) => ({
+                                    id: baseTime + checklistIndex * 10000 + stepIndex * 100 + Math.floor(Math.random() * 100),
+                                    name: step.text || '',
+                                    action: '',
+                                    comment: '',
+                                    completed: step.completed || false
+                                }))
+                            };
+                            checklist.title = checklist.name || 'Imported Checklist';
+                            checklist.checklists = [convertedChecklist];
+                            delete checklist.steps;
+                            delete checklist.name;
+                        }
                     });
                     
                     this.checklists = [...this.checklists, ...imported];
