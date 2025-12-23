@@ -168,7 +168,7 @@ class ChecklistManager {
         stepGroup.className = 'step-input-group';
         
         stepGroup.innerHTML = `
-            <input type="text" class="input-field step-input" placeholder="Étape de la checklist" value="${text}">
+            <input type="text" class="input-field step-input" placeholder="Étape de la checklist" value="${this.escapeHtml(text)}">
             <button type="button" class="btn btn-danger btn-small remove-step-btn">🗑️</button>
         `;
         
@@ -189,11 +189,12 @@ class ChecklistManager {
         
         // Récupérer toutes les étapes
         const stepInputs = document.querySelectorAll('.step-input');
+        const baseTimestamp = Date.now();
         const steps = Array.from(stepInputs)
             .map(input => input.value.trim())
             .filter(text => text !== '')
             .map((text, index) => ({
-                id: Date.now() + index,
+                id: baseTimestamp + index * 1000 + Math.floor(Math.random() * 1000),
                 text: text,
                 completed: false
             }));
@@ -315,10 +316,11 @@ class ChecklistManager {
                 // Fusionner avec les checklists existantes
                 if (confirm(`Importer ${imported.length} checklist(s) ? Cela s'ajoutera aux checklists existantes.`)) {
                     // Réattribuer des IDs pour éviter les conflits
-                    imported.forEach(checklist => {
-                        checklist.id = Date.now() + Math.random();
-                        checklist.steps.forEach(step => {
-                            step.id = Date.now() + Math.random();
+                    let baseTime = Date.now();
+                    imported.forEach((checklist, checklistIndex) => {
+                        checklist.id = baseTime + checklistIndex * 10000 + Math.floor(Math.random() * 1000);
+                        checklist.steps.forEach((step, stepIndex) => {
+                            step.id = baseTime + checklistIndex * 10000 + stepIndex * 100 + Math.floor(Math.random() * 100);
                         });
                     });
                     
